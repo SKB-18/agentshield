@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    name: Go Test Suite & Policy Evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Run Unit & Integration Tests with Coverage
+        run: go test -v -race -count=1 ./...
+
+      - name: Build Gateway Binary
+        run: go build -v ./cmd/gateway
+
+  ui-build:
+    name: React + Vite Frontend Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ui/package.json
+
+      - name: Install Dependencies
+        working-directory: ./ui
+        run: npm install
+
+      - name: Typecheck and Build UI
+        working-directory: ./ui
+        run: npm run build
+
+  docker-build:
+    name: Docker Container Build Check
+    needs: [backend-test, ui-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: agentshield:ci-check

@@ -1,0 +1,19 @@
+services:
+  agentshield:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentshield-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - AGENTSHIELD_PORT=8080
+      - AGENTSHIELD_JWT_SECRET=agentshield-super-secret-production-key-32b
+      - AGENTSHIELD_SANDBOX_DIR=/workspace/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s

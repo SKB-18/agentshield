@@ -1,0 +1,22 @@
+# Binaries
+/bin/
+*.exe
+/gateway
+/agentshield
+
+# Go test and coverage artifacts
+*.out
+coverage.txt
+
+# Node / UI
+ui/node_modules/
+ui/dist/
+ui/.env.local
+ui/.env.*.local
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
