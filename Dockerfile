@@ -13,8 +13,9 @@ RUN npm run build
 # ==========================================
 # Stage 2: Build Go Gateway Binary
 # ==========================================
-FROM golang:1.23-alpine AS go-builder
+FROM golang:alpine AS go-builder
 WORKDIR /app
+ENV GOTOOLCHAIN=auto
 
 RUN apk add --no-cache git ca-certificates
 
