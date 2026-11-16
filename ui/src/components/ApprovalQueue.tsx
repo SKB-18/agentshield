@@ -81,8 +81,8 @@ export const ApprovalQueue: React.FC = () => {
     };
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (state: string) => {
+    switch (state) {
       case 'PENDING':
         return 'bg-amber-950/80 text-amber-300 border-amber-500/40';
       case 'APPROVED':
@@ -160,8 +160,8 @@ export const ApprovalQueue: React.FC = () => {
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-3">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusBadge(rec.status)}`}>
-                      {rec.status}
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusBadge(rec.state)}`}>
+                      {rec.state}
                     </span>
                     <span className="font-mono text-xs font-bold text-cyan-400">
                       {rec.tool_id}
@@ -187,19 +187,19 @@ export const ApprovalQueue: React.FC = () => {
                   <div>
                     <span className="text-slate-500 block mb-0.5">Ticket ID & Hash:</span>
                     <div className="font-mono text-slate-300 select-all truncate">{rec.id}</div>
-                    <div className="text-[10px] font-mono text-slate-500 truncate mt-0.5" title={rec.argument_hash}>
-                      SHA256: {rec.argument_hash}
+                    <div className="text-[10px] font-mono text-slate-500 truncate mt-0.5" title={rec.arguments_hash}>
+                      SHA256: {rec.arguments_hash}
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-slate-500 block mb-0.5">Requested At:</span>
+                    <span className="text-slate-500 block mb-0.5">Created At:</span>
                     <span className="text-slate-300 font-mono">
-                      {new Date(rec.requested_at).toLocaleString()}
+                      {new Date(rec.created_at).toLocaleString()}
                     </span>
-                    {rec.decided_by && (
+                    {rec.approver && (
                       <div className="text-slate-400 mt-0.5">
-                        Decided by: <span className="text-cyan-400 font-semibold">{rec.decided_by}</span>
+                        Decided by: <span className="text-cyan-400 font-semibold">{rec.approver}</span>
                       </div>
                     )}
                   </div>
@@ -218,7 +218,7 @@ export const ApprovalQueue: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
-                  {rec.status === 'PENDING' && !timeInfo.expired && (
+                  {rec.state === 'PENDING' && !timeInfo.expired && (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleDecide(rec.id, true)}
@@ -238,7 +238,7 @@ export const ApprovalQueue: React.FC = () => {
                     </div>
                   )}
 
-                  {rec.status === 'APPROVED' && !rec.consumed && (
+                  {rec.state === 'APPROVED' && (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleExecute(rec)}
@@ -252,13 +252,13 @@ export const ApprovalQueue: React.FC = () => {
                     </div>
                   )}
 
-                  {rec.consumed && (
+                  {rec.state === 'CONSUMED' && (
                     <span className="text-xs text-cyan-400 font-mono flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Ticket consumed (Replay protected)
                     </span>
                   )}
 
-                  {rec.status === 'REJECTED' && (
+                  {rec.state === 'REJECTED' && (
                     <span className="text-xs text-rose-400 font-mono flex items-center gap-1">
                       <ShieldAlert className="w-3.5 h-3.5" /> Authorization denied by human operator
                     </span>
